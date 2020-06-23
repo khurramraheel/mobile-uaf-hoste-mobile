@@ -133,53 +133,79 @@ class TakePictureScreen extends React.Component {
     },
   });
 
-  takePicture = async () => {
+  takePicture = async () => {uploadPath
     if (this.camera) {
-      const options = { quality: 1, base64: true };
-      const data = await this.camera.takePictureAsync(options);
+      const options = { quality: 0.5, base64: true };
+      var data = await this.camera.takePictureAsync(options);
+      // console.log(data);
 
       // axios.get('http://192.168.10.4:8080/api/auth/verify')
 
-      try {
+      var uploadPath = 'http://192.168.10.8:5000/api/auth/verify?verify=true';
+
+      // try {
         this.setState({ processing: true });
-        axios.post('http://192.168.10.16:5000/api/auth/verify?verify=true',
-          {
-            data: data.base64
-          }
-        ).then((res) => {
-          this.setState({ processing: false });
-          if (res.data.success) {
+        // axios.post('http://192.168.10.8:5000/api/auth/verify?verify=true',
+        //   {
+        //     data: data.base64
+        //   }
+        // ).then((res) => {
+        //   this.setState({ processing: false });
+        //   if (res.data.success) {
 
-            console.log("response received");
-            console.log(res.data.name);
-            console.log(res.data.hostel);
-            this.props.navigation.navigate('Details', res.data.user);
-          } else {
+        //     console.log("response received");
+        //     console.log(res.data.name);
+        //     console.log(res.data.hostel);
+        //     this.props.navigation.navigate('Details', res.data.user);
+        //   } else {
 
-          }
+        //   }
 
-        });
+        // });
 
         // let ret = await RNFetchBlob.fetch(
         //   'POST',
-        //   `http://192.168.10.4:8080/api/auth/verify?verify=true`,
+        //   `http://192.168.10.8:5000/api/auth/verify?verify=true`,
         //   {
-        //     'Content-Type': 'applocation.js'
+        //     'Content-Type': 'multipart/form-data'
         //   },
         //   [
         //     {
-        //       name: 'file',
-        //       filename: Date.now() + '.png',
+        //       name: 'fila',
+        //       filename: 'student-image.png',
         //       type: 'image/png',
         //       data: RNFetchBlob.wrap(data.uri),
-        //     },
+        //     }
         //   ],
         // );
 
+
+        // const postImage = (imagePath) => {
+          const photo = {
+            uri: data.uri,
+            name: 'image.png',
+            type: 'image/png',
+          };
+          const cdata = new FormData();
+          cdata.append('fila', photo);
+          const config = {
+            method: 'POST',
+            body: cdata,
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'multipart/form-data',
+            },
+          };
+          console.log("feting")
+         fetch(uploadPath, config);
+        // }
+
+        // postImage(pathToYourFile)
+
         // console.log(ret)
-      } catch (e) {
-        console.log(e.message);
-      }
+      // } catch (e) {
+      //   console.log(e.message);
+      // }
       // return ret;
 
       console.log(data.uri);
@@ -196,7 +222,8 @@ class TakePictureScreen extends React.Component {
         }}
         style={this.styles.preview}
         type={RNCamera.Constants.Type.back}
-        flashMode={RNCamera.Constants.FlashMode.on}
+        // captureTarget={}
+        flashMode={RNCamera.Constants.FlashMode.off}
         androidCameraPermissionOptions={{
           title: 'Permission to use camera',
           message: 'We need your permission to use your camera',

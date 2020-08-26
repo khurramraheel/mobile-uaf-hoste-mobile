@@ -17,7 +17,8 @@ import {
   Button
   ,
   TouchableOpacity,
-  ActivityIndicator
+  ActivityIndicator,
+  Alert
 } from 'react-native';
 
 import RNFetchBlob from 'rn-fetch-blob';
@@ -133,7 +134,8 @@ class TakePictureScreen extends React.Component {
     },
   });
 
-  takePicture = async () => {uploadPath
+  takePicture = async () => {
+    uploadPath
     if (this.camera) {
       const options = { quality: 0.5, base64: true };
       var data = await this.camera.takePictureAsync(options);
@@ -141,68 +143,90 @@ class TakePictureScreen extends React.Component {
 
       // axios.get('http://192.168.10.4:8080/api/auth/verify')
 
-      var uploadPath = 'http://192.168.10.8:5000/api/auth/verify?verify=true';
+      var uploadPath = 'http://192.168.10.6:8080/api/auth/verify?verify=true';
 
       // try {
-        this.setState({ processing: true });
-        // axios.post('http://192.168.10.8:5000/api/auth/verify?verify=true',
-        //   {
-        //     data: data.base64
-        //   }
-        // ).then((res) => {
-        //   this.setState({ processing: false });
-        //   if (res.data.success) {
+      this.setState({ processing: true });
+      // axios.post('http://192.168.10.8:5000/api/auth/verify?verify=true',
+      //   {
+      //     data: data.base64
+      //   }
+      // ).then((res) => {
+      //   this.setState({ processing: false });
+      //   if (res.data.success) {
 
-        //     console.log("response received");
-        //     console.log(res.data.name);
-        //     console.log(res.data.hostel);
-        //     this.props.navigation.navigate('Details', res.data.user);
-        //   } else {
+      //     console.log("response received");
+      //     console.log(res.data.name);
+      //     console.log(res.data.hostel);
+      //     this.props.navigation.navigate('Details', res.data.user);
+      //   } else {
 
-        //   }
+      //   }
 
-        // });
+      // });
 
-        // let ret = await RNFetchBlob.fetch(
-        //   'POST',
-        //   `http://192.168.10.8:5000/api/auth/verify?verify=true`,
-        //   {
-        //     'Content-Type': 'multipart/form-data'
-        //   },
-        //   [
-        //     {
-        //       name: 'fila',
-        //       filename: 'student-image.png',
-        //       type: 'image/png',
-        //       data: RNFetchBlob.wrap(data.uri),
-        //     }
-        //   ],
-        // );
+      // let ret = await RNFetchBlob.fetch(
+      //   'POST',
+      //   `http://192.168.10.8:5000/api/auth/verify?verify=true`,
+      //   {
+      //     'Content-Type': 'multipart/form-data'
+      //   },
+      //   [
+      //     {
+      //       name: 'fila',
+      //       filename: 'student-image.png',
+      //       type: 'image/png',
+      //       data: RNFetchBlob.wrap(data.uri),
+      //     }
+      //   ],
+      // );
 
 
-        // const postImage = (imagePath) => {
-          const photo = {
-            uri: data.uri,
-            name: 'image.png',
-            type: 'image/png',
-          };
-          const cdata = new FormData();
-          cdata.append('fila', photo);
-          const config = {
-            method: 'POST',
-            body: cdata,
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'multipart/form-data',
-            },
-          };
-          console.log("feting")
-         fetch(uploadPath, config);
-        // }
+      // const postImage = (imagePath) => {
+      const photo = {
+        uri: data.uri,
+        name: 'image.png',
+        type: 'image/png',
+      };
+      const cdata = new FormData();
+      cdata.append('fila', photo);
+      const config = {
+        method: 'POST',
+        body: cdata,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'multipart/form-data',
+        },
+      };
+      console.log("feting")
 
-        // postImage(pathToYourFile)
+      fetch(uploadPath, config).then((res) => {
 
-        // console.log(ret)
+        return res.json();
+
+      }).then((res) => {
+        
+        console.log("I receved")
+        console.log(res.success);
+
+        if (!res.success) {
+          Alert.alert("Person not identified");
+          // Alert.alert(res.success.toString());
+        } else {
+          console.log('verified data');
+          console.log(res.user.name)
+          console.log(res.user.hostel)
+          this.props.navigation.navigate('Details', res.user);
+        }
+
+      });
+
+
+      // }
+
+      // postImage(pathToYourFile)
+
+      // console.log(ret)
       // } catch (e) {
       //   console.log(e.message);
       // }
